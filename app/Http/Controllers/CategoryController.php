@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class CategoryController extends Controller
@@ -13,7 +14,11 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        return Inertia::render('categories/index');
+        $categories = Category::where('user_id', Auth::id())->get();
+
+        return Inertia::render('categories/index', [
+            'categories' => $categories,
+        ]);
     }
 
     /**
@@ -21,7 +26,7 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        //
+        return Inertia::render('categories/create');
     }
 
     /**
@@ -29,7 +34,18 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validation = $request->validate([
+            'name' => [
+                'required'
+            ],
+        ]);
+
+        Category::create([
+            ...$validation,
+            'user_id' => Auth::id(),
+        ]);
+
+        return to_route('categories.index');
     }
 
     /**
@@ -45,7 +61,13 @@ class CategoryController extends Controller
      */
     public function edit(Category $category)
     {
-        //
+        if ($category->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        return Inertia::render('categories/edit', [
+            'category' => $category,
+        ]);
     }
 
     /**
@@ -53,7 +75,19 @@ class CategoryController extends Controller
      */
     public function update(Request $request, Category $category)
     {
-        //
+        if ($category->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $validation = $request->validate([
+            'name' => [
+                'required'
+            ],
+        ]);
+
+        $category->update($validation);
+
+        return to_route('categories.index');
     }
 
     /**
@@ -61,6 +95,12 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
-        //
+        if ($category->user_id !== Auth::id()) {
+            return to_route('categories.index');
+        }
+
+        $category->delete();
+
+        return to_route('categories.index');
     }
 }

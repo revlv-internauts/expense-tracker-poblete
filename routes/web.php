@@ -18,9 +18,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
+    Route::resource('expenses', ExpenseController::class);
     Route::resource('accounts', AccountController::class);
     Route::resource('categories', CategoryController::class);
-    Route::resource('expenses', ExpenseController::class);
 });
 
 require __DIR__.'/settings.php';

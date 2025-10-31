@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Account;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class AccountController extends Controller
@@ -13,7 +14,11 @@ class AccountController extends Controller
      */
     public function index()
     {
-        return Inertia::render('accounts/index');
+        $accounts = Account::where('user_id', Auth::id())->get();
+
+        return Inertia::render('accounts/index', [
+            'accounts' => $accounts,
+        ]);
     }
 
     /**
@@ -21,7 +26,7 @@ class AccountController extends Controller
      */
     public function create()
     {
-        //
+        return Inertia::render('accounts/create');
     }
 
     /**
@@ -29,7 +34,18 @@ class AccountController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validation = $request->validate([
+            'name' => [
+                'required'
+            ],
+        ]);
+
+        Account::create([
+            ...$validation,
+            'user_id' => Auth::id(),
+        ]);
+
+        return to_route('accounts.index');
     }
 
     /**
@@ -45,7 +61,13 @@ class AccountController extends Controller
      */
     public function edit(Account $account)
     {
-        //
+        if ($account->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        return Inertia::render('accounts/edit', [
+            'account' => $account,
+        ]);
     }
 
     /**
@@ -53,7 +75,19 @@ class AccountController extends Controller
      */
     public function update(Request $request, Account $account)
     {
-        //
+        if ($account->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $validation = $request->validate([
+            'name' => [
+                'required'
+            ],
+        ]);
+
+        $account->update($validation);
+
+        return to_route('accounts.index');
     }
 
     /**
@@ -61,6 +95,12 @@ class AccountController extends Controller
      */
     public function destroy(Account $account)
     {
-        //
+        if ($account->user_id !== Auth::id()) {
+            return to_route('accounts.index');
+        }
+
+        $account->delete();
+
+        return to_route('accounts.index');
     }
 }

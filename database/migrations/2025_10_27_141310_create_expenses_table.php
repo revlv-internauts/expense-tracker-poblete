@@ -13,8 +13,10 @@ return new class extends Migration
     {
         Schema::create('expenses', function (Blueprint $table) {
             $table->id();
-            $table->string('detail');
+            $table->string('description');
             $table->decimal('amount', 10, 2);
+            $table->foreignId('account_id')->constrained()->onDelete('restrict');
+            $table->foreignId('category_id')->constrained()->onDelete('restrict');
             $table->timestamps();
         });
     }

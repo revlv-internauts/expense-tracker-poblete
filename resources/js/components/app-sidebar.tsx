@@ -23,6 +23,11 @@ const mainNavItems: NavItem[] = [
         icon: LayoutGrid,
     },
     {
+        title: 'Expenses',
+        href: '/expenses',
+        icon: Banknote,
+    },
+    {
         title: 'Accounts',
         href: '/accounts',
         icon: Activity,
@@ -31,11 +36,6 @@ const mainNavItems: NavItem[] = [
         title: 'Categories',
         href: '/categories',
         icon: ChartBarStacked,
-    },
-    {
-        title: 'Expenses',
-        href: '/expenses',
-        icon: Banknote,
     },
 ];
 
